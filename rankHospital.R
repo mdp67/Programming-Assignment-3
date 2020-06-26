@@ -1,7 +1,11 @@
 rankhospital <- function(state = "TX", outcome = "heart attack", num = "best") {
     
     ## Read outcome data
+    #stringsAsFactors = F keeps the Not Available from driving values to factors
+    #na.strings tells R which factors to consider NA
     outcomeDF <- read.csv("outcome-of-care-measures.csv", stringsAsFactors = FALSE, na.strings = "Not Available")
+    
+    #2 = names, 7 = state, 11, 17, 23 are the three factors we are ranking on h-attack, h-failure, pneumonia. Only pull those
     outcomeDF <- outcomeDF[ ,c(2,7,11,17,23)]
     
     ## Check that state and outcome are valid
@@ -19,37 +23,37 @@ rankhospital <- function(state = "TX", outcome = "heart attack", num = "best") {
         stop("invalid outcome")
     }
     
-
-    
+    #keep all the rows, name and state, but only keep the outcome column in the argument, now that it's verified as good
     dfToSort <- outcomeDF[ , c("Hospital.Name", "State", outcome)]
+    
+    #get rid of all the rows that don't have values for the outcome in question
     dfToSort <- na.omit(dfToSort)
     
-    
-    ## 
+    #order the rows on outcome first, then the name
+    #originally worked dfToSort[3] dfToSort[1].  the [[]] gives an obect [] gives a list
     orderedDF <- dfToSort[order(dfToSort[[outcome]], dfToSort$Hospital.Name), ]
+    
+    #this split creates a list of, lists, of data frames - took me forever to figure out using dim and str
     listByState <- split(orderedDF, orderedDF$State)
-    listOfOneState <- listByState[[state]]
     
-    #ranked_hospitals <- lapply(listOfOneState, function(x) x[ , 1])
+    #top level list is the states, so select the state of interest, the [[]] pulls the data frame out of the list
+    #if only using [] it returns a list of one data frame x unkown rows, 3 columns
+    dfOfOneState <- listByState[[state]]
     
-    #hospital <- ranked_hospitals[[num]]
-    # vectorOfHospitals <- vector(mode = "list", length = )
-    
-    dfOrderedName <- listOfOneState[1]
-    numberOfRows <- nrow(dfOrderedName)
-    print(dfOrderedName[numberOfRows, 1])
-    
-    # index <- 1
-    # for (i in seq_along(listOfOneState)) {
-    #     
-    #     index <- index +1
-    #     print(i)
-    #     print(listOfOneState[i])
-    #     print(class(listOfOneState[i]))
-    #     print(dim(listOfOneState[i]))
-    #     print(nrow(listOfOneState[i]))
-    #     print(listOfOneState[i][4, 1])
-    # }
-    #print(ranked_hospitals)
+    #assume it's best (first selection), if it's worst, pick the last row.
+    rowToSelect <- 1
+    if (num %in% "worst") {
+        rowToSelect <- nrow(dfOfOneState)
+    }
+    # if num is a numeric value, set that as the row to select
+    if (is.numeric(num)) {
+        rowToSelect <- num
+    }
 
+    #return the row selected
+    dfOfOneState[rowToSelect, 1]
 }
+
+testing <- rankhospital()
+head(testing)
+
