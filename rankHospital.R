@@ -1,4 +1,4 @@
-best <- function(state = "TX", outcome = "heart attack") {
+rankhospital <- function(state = "TX", outcome = "heart attack", num = "best") {
     
     ## Read outcome data
     outcomeDF <- read.csv("outcome-of-care-measures.csv", stringsAsFactors = FALSE, na.strings = "Not Available")
@@ -19,7 +19,8 @@ best <- function(state = "TX", outcome = "heart attack") {
         stop("invalid outcome")
     }
     
- 
+
+    
     dfToSort <- outcomeDF[ , c("Hospital.Name", "State", outcome)]
     dfToSort <- na.omit(dfToSort)
     
@@ -27,9 +28,28 @@ best <- function(state = "TX", outcome = "heart attack") {
     ## 
     orderedDF <- dfToSort[order(dfToSort[[outcome]], dfToSort$Hospital.Name), ]
     listByState <- split(orderedDF, orderedDF$State)
-    listOfOneState <- listByState[state]
+    listOfOneState <- listByState[[state]]
     
-    ranked_hospitals <- lapply(listOfOneState, function(x) x[1, 1])
-    print(ranked_hospitals)
-}
+    #ranked_hospitals <- lapply(listOfOneState, function(x) x[ , 1])
+    
+    #hospital <- ranked_hospitals[[num]]
+    # vectorOfHospitals <- vector(mode = "list", length = )
+    
+    dfOrderedName <- listOfOneState[1]
+    numberOfRows <- nrow(dfOrderedName)
+    print(dfOrderedName[numberOfRows, 1])
+    
+    # index <- 1
+    # for (i in seq_along(listOfOneState)) {
+    #     
+    #     index <- index +1
+    #     print(i)
+    #     print(listOfOneState[i])
+    #     print(class(listOfOneState[i]))
+    #     print(dim(listOfOneState[i]))
+    #     print(nrow(listOfOneState[i]))
+    #     print(listOfOneState[i][4, 1])
+    # }
+    #print(ranked_hospitals)
 
+}
