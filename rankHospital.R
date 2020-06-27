@@ -16,14 +16,14 @@ rankhospital <- function(state = "TX", outcome = "heart attack", num = "best") {
     if (!(state %in% vectOfstateCol)) {
         stop("invalid state" )
     }
-    #create a vector of the names of each column because the outcome must be in there, the first ten are not outcomes
+    #create names for the columns that are relevent
     namesForColumns <- c("Hospital.Name", "State", "heart attack", "heart failure", "pneumonia")
     colnames(outcomeDF) <- namesForColumns
     if (!(outcome %in% namesForColumns)) {
         stop("invalid outcome")
     }
     
-    #keep all the rows, name and state, but only keep the outcome column in the argument, now that it's verified as good
+    #keep all the rows, name and state, but only keep the outcome column of concern in the argument, now that it's verified as good
     dfToSort <- outcomeDF[ , c("Hospital.Name", "State", outcome)]
     
     #get rid of all the rows that don't have values for the outcome in question
